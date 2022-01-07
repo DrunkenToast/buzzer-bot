@@ -13,64 +13,34 @@ import { Routes } from 'discord-api-types';
 
 export async function buildClient(): Promise<Client> {
   const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES], partials: ['USER', 'CHANNEL', 'GUILD_MEMBER', 'MESSAGE', 'REACTION']});
-  const config = await ConfigService.get();
-
 
   if (!process.env.DISCORD_TOKEN) throw new Error('discord token undefined');
   const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_TOKEN);
-
+  
   client.on('interactionCreate', async (interaction) => {
     if (!interaction.isCommand()) {
       return;
     }
-    Logger.info(`${interaction.user.username} used ${interaction.commandName}`);
+    console.log(`${interaction.user.username} used ${interaction.commandName}`);
     for (const command of commands) {
+      console.log(command.name);
       if (command.name == interaction.commandName) {
         await command.response(interaction);
       }
     }
   });
-
+  
   client.on('ready', async () => {
-    Logger.info(`Logged in as ${client.user?.tag}`);
+    console.log(commands);
+    console.log(`Logged in as ${client.user?.tag}`);
 
     rest.put(
-      //`/applications/${client.user!.id}/guilds/780572565240414208/commands`,
-      `/applications/${client.user!.id}/commands`,
+      `/applications/${client.user!.id}/guilds/389813484680118274/commands`,
+      // `/applications/${client.user!.id}/commands`,
       { body: commands });
       
-    /*
-      Presence updating.
-      Value may not be below 15000 (rate-limit Discord API = 5/60s).
-    */
-    const interval = Math.max(15000, config.discord.richpresence.interval);
-    const length = config.discord.richpresence.states.length;
-
-    // cycles through rich presence messages
-    let index = 0;
-    setInterval(() => {
-      client.user?.setPresence(config.discord.richpresence.states[index]);
-      if (index++, index >= length) {
-        index = 0;
-      }
-    }, interval);
   });
 
-  client.on('guildCreate', async guild => {
-    const roleNames = ['student', 'teacher'];
-
-    const roleIDs: Record<string, string> = {};
-    for (const roleName of roleNames) {
-      const role = await guild.roles.create({ name: roleName });
-      roleIDs[roleName] = role.id;
-    }
-    GuildService.createDefault(guild.id, roleIDs);
-  });
-
-  client.on('guildDelete', (i)=>{
-    GuildService.delete(i.id);
-  });
   await client.login(process.env.DISCORD_TOKEN);
   return client;
-
 }

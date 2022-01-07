@@ -1,4 +1,4 @@
-import { CacheType, Collection, ColorResolvable, CommandInteraction, DMChannel, GuildMember, MessageActionRow, MessageButton, MessageComponentInteraction, MessageEmbed, PartialGroupDMChannel } from 'discord.js';
+import { CacheType, Collection, ColorResolvable, CommandInteraction, DMChannel, GuildMember, MessageActionRow, MessageButton, MessageComponentInteraction, MessageEmbed, PartialGroupDMChannel, TextChannel } from 'discord.js';
 import { Colors } from './util/embed-builder';
 import { Logger } from './util/logger';
 
@@ -38,8 +38,8 @@ export class Buzzer {
       && i.user.id == this.interaction.user.id
       && i.message.interaction!.id == this.interaction.id;
 
-    const buzzCollector = this.interaction.channel?.createMessageComponentCollector({ filter: buzzFilter, time: this.expireTime });
-    const controlCollector = this.interaction.channel?.createMessageComponentCollector({ filter: buzzerControlFilter, time: this.expireTime });
+    const buzzCollector = (<any>this.interaction.channel)?.createMessageComponentCollector({ filter: buzzFilter, time: this.expireTime });
+    const controlCollector = (<any>this.interaction.channel)?.createMessageComponentCollector({ filter: buzzerControlFilter, time: this.expireTime });
 
     if (!buzzCollector) return;
     if (!controlCollector) return;
@@ -140,7 +140,7 @@ export class Challenge {
       .map(i => i.customId).includes(i.customId)
       && i.user.id == player.id
       && i.message.interaction!.id == this.interaction.id;
-    const collector = this.interaction.channel?.createMessageComponentCollector({ filter: filter, time: this.expireTime });
+    const collector = (<any>this.interaction.channel)?.createMessageComponentCollector({ filter: filter, time: this.expireTime });
 
     this.interaction.reply({
       content: `<@!${player.id}>`,

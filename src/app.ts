@@ -17,6 +17,4 @@ if (process.env.NODE_ENV == null || process.env.NODE_ENV === 'develepmont') {
 //   await buildClient()
 //   // new ShardService(process.env.API_URL || '');
 // })();
-(async () => {
-  await buildClient();
-});
+buildClient();
