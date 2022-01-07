@@ -112,7 +112,7 @@ export class ShardService {
   }
 
   private async build(msg: any): Promise<void> {
-    this.client = await buildClient(msg.data.number, msg.data.total);
+    // this.client = await buildClient(msg.data.number, msg.data.total);
     //this.announcementJob = CanvasService.initAnnouncementJob('a40d37b54851efbcadb35e68bf03d698', this.client, '780572565240414208'); //Hard coded for now.
   }
 

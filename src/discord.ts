@@ -11,8 +11,8 @@ import { loggers } from 'winston';
 import { Routes } from 'discord-api-types';
 
 
-export async function buildClient(shard: number, shardCount: number): Promise<Client> {
-  const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES], partials: ['USER', 'CHANNEL', 'GUILD_MEMBER', 'MESSAGE', 'REACTION'], shards: shard, shardCount: shardCount });
+export async function buildClient(): Promise<Client> {
+  const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES], partials: ['USER', 'CHANNEL', 'GUILD_MEMBER', 'MESSAGE', 'REACTION']});
   const config = await ConfigService.get();
 
 

@@ -1,4 +1,4 @@
-import { ButtonInteraction, ColorResolvable, CommandInteraction, GuildMember, MessageActionRow, MessageButton, MessageEmbed, User } from 'discord.js';
+import { CacheType, Collection, ColorResolvable, CommandInteraction, DMChannel, GuildMember, MessageActionRow, MessageButton, MessageComponentInteraction, MessageEmbed, PartialGroupDMChannel } from 'discord.js';
 import { Colors } from './util/embed-builder';
 import { Logger } from './util/logger';
 
@@ -29,11 +29,11 @@ export class Buzzer {
       components: [new MessageActionRow({ components: this.buttonBuzzer }), new MessageActionRow({ components: this.buttonsBuzzerControls })]
     });
 
-    const buzzFilter = (i: ButtonInteraction) => this.buttonBuzzer
+    const buzzFilter = (i: MessageComponentInteraction) => this.buttonBuzzer
       .map(i => i.customId).includes(i.customId)
       && i.message.interaction!.id == this.interaction.id;
 
-    const buzzerControlFilter = (i: ButtonInteraction) => this.buttonsBuzzerControls
+    const buzzerControlFilter = (i: MessageComponentInteraction) => this.buttonsBuzzerControls
       .map(i => i.customId).includes(i.customId)
       && i.user.id == this.interaction.user.id
       && i.message.interaction!.id == this.interaction.id;
@@ -45,7 +45,7 @@ export class Buzzer {
     if (!controlCollector) return;
 
     // Collectors
-    buzzCollector.on('collect', i => {
+    buzzCollector.on('collect', (i: MessageComponentInteraction<CacheType>) => {
       buzzCollector.resetTimer();
       controlCollector.resetTimer();
 
@@ -58,7 +58,7 @@ export class Buzzer {
       this.updateButtonInteraction(i, Colors.success, i.member.displayName + ' buzzed!');
     });
 
-    controlCollector.on('collect', i => {
+    controlCollector.on('collect', (i: MessageComponentInteraction<CacheType>) => {
       buzzCollector.resetTimer();
       controlCollector.resetTimer();
 
@@ -96,7 +96,7 @@ export class Buzzer {
     return embed;
   }
 
-  updateButtonInteraction(i: ButtonInteraction, color: Colors, footer: string): void {
+  updateButtonInteraction(i: MessageComponentInteraction, color: Colors, footer: string): void {
     i.update({
       embeds: [this.createEmbed(color, footer)],
       components: [new MessageActionRow({ components: this.buttonBuzzer }), new MessageActionRow({ components: this.buttonsBuzzerControls })]
@@ -108,7 +108,7 @@ export class Buzzer {
       embeds: [
         this.createEmbed(Colors.warning, 'Buzzer has timed out, you can always start a new one').setTitle('No more 🅱uzz 🐝')
       ], components: []
-    }).catch(() => Logger.error("could not edit reply, message probably deleted games:l111"));
+    }).catch(() => Logger.error('could not edit reply, message probably deleted games:l111'));
 
   }
 }
@@ -136,7 +136,7 @@ export class Challenge {
 
     // Player being challenged may accept or decline
     const player = this.interaction.options.getUser('player', true);
-    const filter = (i: ButtonInteraction) => buttonsChallenge
+    const filter = (i: MessageComponentInteraction) => buttonsChallenge
       .map(i => i.customId).includes(i.customId)
       && i.user.id == player.id
       && i.message.interaction!.id == this.interaction.id;
@@ -153,7 +153,7 @@ export class Challenge {
 
 
     if (!collector) return;
-    collector.on('collect', i => {
+    collector.on('collect', (i: MessageComponentInteraction<CacheType>) => {
       switch (i.customId) {
         case buttonsChallenge[0].customId:
           collector.stop('accept');
@@ -165,7 +165,7 @@ export class Challenge {
       }
     });
 
-    collector.on('end', (collected, reason) => {
+    collector.on('end', (collected: Collection<string, MessageComponentInteraction<CacheType>>, reason: string) => {
       const embed = new MessageEmbed();
       if (reason == 'accept') {
         return;
@@ -175,7 +175,7 @@ export class Challenge {
           .setTitle(`${player.username} was too afraid to accept this challenge!`)
           .setColor(Colors.error);
         this.interaction.editReply({ embeds: [embed], components: [] })
-          .catch(() => Logger.error("could not edit reply, message probably deleted games:l111"));;
+          .catch(() => Logger.error('could not edit reply, message probably deleted games:l111'));
       }
       else {
         embed
@@ -185,66 +185,12 @@ export class Challenge {
           embeds: [embed], components: [
             new MessageActionRow({ components: actionRowChallenge.components.map(i => i.setDisabled(true)) })
           ]
-        }).catch(() => Logger.error("could not edit reply, message probably deleted games:l111"));
+        }).catch(() => Logger.error('could not edit reply, message probably deleted games:l111'));
       }
     });
   }
 }
 
-// Unfinished
-/*
-export class RockPaperScissors {
-  challenge: Challenge
-  interaction: CommandInteraction
-  readonly expireTime = 60000
-  
-  constructor(interaction: CommandInteraction) {
-    this.interaction = interaction;
-    this.challenge = new Challenge(this.interaction, 'Rock Paper Scissors');
-  
-    this.challenge.init(() => this.rps(3));
-  }
-
-  async rps(bestOf: number): Promise<void> {
-    const players: [User, User] = [this.interaction.user, this.interaction.options.getUser('player', true)];
-    let score: [number, number] = [0, 0];
-    let status: [string, string] = ['has not picked', 'has not picked'];
-    let guess: [string, string];
-    
-    const buttonsRps = [
-      new MessageButton({ label: 'Rock', customId: 'rock', emoji: '🪨', style: 'PRIMARY' }),
-      new MessageButton({ label: 'Paper', customId: 'paper', emoji: '📝', style: 'PRIMARY' }),
-      new MessageButton({ label: 'Scissors', customId: 'scissors', emoji: '✂️', style: 'PRIMARY' })
-    ];
-    const actionRowRps = new MessageActionRow({
-      components: buttonsRps
-    });
-
-    this.interaction.editReply({embeds: [this.buildEmbed(players, status, score)], components: [actionRowRps]});
-    const filter = (i: ButtonInteraction) => buttonsRps
-      .map(i => i.customId).includes(i.customId)
-      && (i.user.id == players[0].id || i.user.id == players[1].id)
-      && i.message.interaction!.id == this.interaction.id;
-
-    const collector = this.interaction.channel?.createMessageComponentCollector({ filter: filter, time: this.expireTime });
-    if (collector == null) return;
-    collector.on('collect', async i => {
-      // switch i.customId {
-      //   case buttonsRps[0].customId:
-          
-      // }
-    });
-  }
-
-  buildEmbed(players: [User, User], status: [string, string], score: [number, number]): MessageEmbed{
-    const embed = new MessageEmbed()
-      .setTitle('Rock paper scissors')
-      .setDescription(players.map((u, i) => `${u.username} ${status[i]}`).join('\n'))
-      .addField(`${players[0].username} - ${players[1].username}`, `${score[0]} - ${score[1]}`);
-    return embed;
-  }
-}
-*/
 export class DiceRoll {
   roll(amount: number, faces: number): MessageEmbed {
     const embed = new MessageEmbed;
