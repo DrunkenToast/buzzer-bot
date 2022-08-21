@@ -1,0 +1,9 @@
+version: "2.2"
+
+services:
+  bot:
+    build:
+      context: '.'
+    container_name: 'buzzer-bot'
+    environment:
+      DISCORD_TOKEN: ${DISCORD_TOKEN}

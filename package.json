@@ -13,7 +13,7 @@
         "@google-cloud/logging-winston": "^4.1.0",
         "axios": "^0.21.0",
         "bufferutil": "^4.0.2",
-        "discord-api-types": "^0.22.0",
+        "discord-api-types": "^0.37.3",
         "discord.js": "^13",
         "luxon": "^1.28.0",
         "socket.io-client": "^4.1.3",

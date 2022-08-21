@@ -1,30 +1,31 @@
-# Discord bot
+# Discord buzzer bot
+
+Please don't use, this is horribly deprecated.
+This project was made with scraps and bits from other projects to quickly get
+something together for friends.
+
+Features:
+- Buzzer
+- Roll dice
+- Coinflip
+
 ## Requirements
 - [node](https://nodejs.org/en/)
 - [yarn](https://yarnpkg.com/getting-started/install)
 
-## Installation
-
-```sh
-yarn install
-```
+## Running
 
 Create `.env` file in root with content:
 
-```txt
+```
 DISCORD_TOKEN="<Discord bot token>"
-API_URL="http://localhost:3000"
-
-# Login to API (JWT signing)
-PASSWORDAPIBOT="supersecretpassword"
 ```
 
-Notes:
+```sh
+docker compose --env-file .env up -d
+```
 
-1. API_URL may not end in '/'
-2. PASSWORDAPIBOT has to be the same value as the API's dotenv, otherwise you will get a 403 forbidden status code when launching the bot.
-
-## Running
+## Dev
 
 ```sh
 yarn serve

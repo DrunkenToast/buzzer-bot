@@ -1,8 +1,8 @@
 # build stage
-FROM node:13.12.0-alpine as build-stage
+FROM node:16-alpine as build-stage
 WORKDIR /app
+RUN yarn global add pm2
 COPY package*.json ./
-RUN npm install -v
+RUN yarn install
 COPY . .
-RUN npm run tsc
-CMD ["node", "build/app.js"]
+CMD pm2-runtime 'yarn serve'
