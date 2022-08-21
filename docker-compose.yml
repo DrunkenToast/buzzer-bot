@@ -1,9 +1,11 @@
-version: "2.2"
+version: "3"
 
 services:
   bot:
     build:
       context: '.'
     container_name: 'buzzer-bot'
+    env_file:
+      - .env
     environment:
       DISCORD_TOKEN: ${DISCORD_TOKEN}
