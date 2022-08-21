@@ -1,5 +1,4 @@
-import { ApplicationCommandOption, ApplicationCommandOptionData, CommandInteraction, Interaction, MessageEmbed, MessageEmbedOptions } from 'discord.js';
-import { GuildConfig } from './guild';
+import { ApplicationCommandOptionData, CommandInteraction, MessageEmbed, MessageEmbedOptions } from 'discord.js';
 
 export type Response = string | MessageEmbedOptions | MessageEmbed;
 export interface Command {

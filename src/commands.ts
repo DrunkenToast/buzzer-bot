@@ -1,7 +1,7 @@
 import { CommandInteraction } from 'discord.js';
 import { Command } from './models/command';
 import { EmbedBuilder } from './util/embed-builder';
-import { Buzzer, Coinflip, DiceRoll, Challenge } from './games';
+import { Buzzer, Coinflip, DiceRoll } from './games';
 
 export const commands: Command[] = [
     { // Buzzer
